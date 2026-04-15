@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>weecology/retriever — OSS Contributions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:#58a6ff;text-decoration:none;transition:color .2s}
+a:hover{color:#79c0ff}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+/* Hero */
+.hero{padding:64px 0 48px;text-align:center;border-bottom:1px solid #21262d}
+.hero h1{font-size:2.5rem;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.hero .subtitle{font-size:1.1rem;color:#8b949e;margin-bottom:32px}
+.stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-bottom:32px}
+.stat{text-align:center}
+.stat .num{font-size:2rem;font-weight:700;color:#58a6ff;display:block}
+.stat .label{font-size:.85rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em}
+/* Timeline bar */
+.timeline-bar{display:flex;align-items:end;justify-content:center;gap:4px;height:48px;margin-bottom:8px}
+.timeline-bar .year-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.timeline-bar .bar{width:28px;border-radius:3px 3px 0 0;background:#238636;min-height:2px;transition:background .2s}
+.timeline-bar .bar:hover{background:#2ea043}
+.timeline-bar .yr{font-size:.65rem;color:#8b949e}
+/* Filters */
+.filters{display:flex;justify-content:center;gap:8px;padding:24px 0;flex-wrap:wrap}
+.filters button{background:#21262d;color:#c9d1d9;border:1px solid #30363d;padding:8px 18px;border-radius:20px;cursor:pointer;font-size:.85rem;font-family:inherit;transition:all .2s}
+.filters button:hover,.filters button.active{background:#58a6ff;color:#0d1117;border-color:#58a6ff}
+/* Section headers */
+.section-header{font-size:1.3rem;font-weight:600;color:#f0f6fc;margin:40px 0 20px;padding-bottom:12px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:12px}
+.section-header .badge{font-size:.75rem;background:#238636;color:#fff;padding:3px 10px;border-radius:12px;font-weight:500}
+.section-header .joss-badge{background:#8957e5}
+/* Cards grid */
+.cards{display:grid;gap:20px;margin-bottom:32px}
+.cards.tier1{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.cards.tier2{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.cards.tier3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+/* Card */
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:24px;transition:border-color .2s,transform .15s;cursor:pointer;display:flex;flex-direction:column;position:relative;text-decoration:none;color:inherit}
+.card:hover{border-color:#58a6ff;transform:translateY(-2px)}
+.card.tier1-card{border-left:3px solid #58a6ff}
+.card.tier2-card{border-left:3px solid #8957e5}
+.card .repo-name{font-size:1.1rem;font-weight:600;color:#58a6ff;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .repo-name .joss-tag{font-size:.65rem;background:#8957e5;color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
+.card .repo-name .auto-tag{font-size:.65rem;background:#d29922;color:#0d1117;padding:2px 8px;border-radius:10px;font-weight:500}
+.card .desc{font-size:.9rem;color:#8b949e;margin-bottom:12px;flex-grow:1}
+.card .meta{display:flex;align-items:center;gap:16px;font-size:.8rem;color:#8b949e;margin-bottom:12px;flex-wrap:wrap}
+.card .meta .lang{display:flex;align-items:center;gap:4px}
+.card .meta .lang .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.card .commit-count{font-weight:600;color:#c9d1d9}
+/* Sparkline */
+.sparkline{display:flex;align-items:end;gap:1px;height:24px;margin-bottom:12px}
+.sparkline .spark-bar{flex:1;border-radius:1px 1px 0 0;background:#238636;min-height:1px;opacity:.7}
+/* Commit previews */
+.commit-previews{border-top:1px solid #21262d;padding-top:10px;margin-top:auto}
+.commit-previews .cp{font-size:.78rem;color:#8b949e;padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.commit-previews .cp .sha{color:#58a6ff;font-family:'SF Mono',Consolas,monospace;font-size:.72rem;margin-right:6px}
+/* Tier 4 compact list */
+.compact-section{margin-bottom:40px}
+.compact-toggle{background:#161b22;border:1px solid #30363d;color:#c9d1d9;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:.95rem;font-family:inherit;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s}
+.compact-toggle:hover{border-color:#58a6ff}
+.compact-toggle .arrow{transition:transform .3s}
+.compact-toggle.open .arrow{transform:rotate(180deg)}
+.compact-list{display:none;margin-top:8px}
+.compact-list.open{display:block}
+.compact-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #21262d;gap:16px;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit}
+.compact-item:hover{background:#161b22}
+.compact-item:last-child{border-bottom:none}
+.compact-item .ci-name{font-weight:500;color:#58a6ff;min-width:200px;font-size:.9rem}
+.compact-item .ci-desc{color:#8b949e;font-size:.82rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-item .ci-count{font-weight:600;color:#c9d1d9;font-size:.85rem;min-width:60px;text-align:right}
+.compact-item .ci-dates{color:#8b949e;font-size:.78rem;min-width:120px;text-align:right}
+.compact-item .ci-lang .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.compact-item .ci-tags{display:flex;gap:4px}
+.compact-item .auto-tag{font-size:.6rem;background:#d29922;color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:500}
+.compact-item .upstream-tag{font-size:.6rem;background:#238636;color:#fff;padding:1px 6px;border-radius:8px;font-weight:500}
+/* Footer */
+.footer{text-align:center;padding:40px 0;border-top:1px solid #21262d;color:#8b949e;font-size:.85rem}
+/* Detail page */
+.detail-header{padding:48px 0 32px;border-bottom:1px solid #21262d}
+.detail-header .back{font-size:.9rem;color:#58a6ff;margin-bottom:16px;display:inline-block}
+.detail-header .back:hover{color:#79c0ff}
+.detail-header h1{font-size:2rem;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.detail-header .desc{color:#8b949e;font-size:1rem;margin-bottom:16px}
+.detail-header .meta{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.detail-header .meta span{font-size:.9rem;color:#8b949e}
+.detail-header .meta .lang .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+.detail-header .meta .count{font-weight:600;color:#c9d1d9}
+.detail-header .gh-link{color:#58a6ff;font-size:.9rem}
+.month-group{margin:32px 0 16px}
+.month-group h3{font-size:1rem;font-weight:600;color:#f0f6fc;padding-bottom:8px;border-bottom:1px solid #21262d}
+.commit-row{display:flex;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(48,54,61,.5);gap:16px}
+.commit-row:last-child{border-bottom:none}
+.commit-row .c-sha{font-family:'SF Mono',Consolas,monospace;font-size:.82rem;color:#58a6ff;min-width:80px}
+.commit-row .c-sha:hover{text-decoration:underline}
+.commit-row .c-date{font-size:.82rem;color:#8b949e;min-width:100px}
+.commit-row .c-msg{font-size:.9rem;color:#c9d1d9;flex:1}
+@media(max-width:768px){
+  .hero h1{font-size:1.8rem}
+  .stats{gap:24px}
+  .stat .num{font-size:1.5rem}
+  .cards.tier1,.cards.tier2,.cards.tier3{grid-template-columns:1fr}
+  .compact-item{flex-wrap:wrap;gap:8px}
+  .compact-item .ci-name{min-width:auto}
+  .compact-item .ci-desc{display:none}
+  .commit-row{flex-wrap:wrap;gap:4px}
+  .commit-row .c-date{min-width:auto}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="detail-header">
+<a href="index.html" class="back">← Back to all projects</a>
+<h1>weecology/retriever</h1>
+<p class="desc">Google Summer of Code 2016. Python data retrieval tool for ecology.</p>
+<div class="meta">
+<span class="count">69 commits</span>
+<span>Mar 19, 2016 — Feb 13, 2017</span>
+<span class="lang"><span class="dot" style="background:#3572A5"></span> Python</span>
+<a class="gh-link" href="https://github.com/weecology/retriever" target="_blank" rel="noopener">View on GitHub ↗</a>
+</div>
+</div>
+<div class="month-group"><h3>February 2017</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/4fcefd9d" target="_blank" rel="noopener">4fcefd9d</a>
+<span class="c-date">Feb 13, 2017</span>
+<span class="c-msg">Merge pull request #789 from ethanwhite/add-akash</span>
+</div>
+<div class="month-group"><h3>November 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/981a7abf" target="_blank" rel="noopener">981a7abf</a>
+<span class="c-date">Nov 05, 2016</span>
+<span class="c-msg">Remove urlretrieve import from python 2</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/cbe4c689" target="_blank" rel="noopener">cbe4c689</a>
+<span class="c-date">Nov 03, 2016</span>
+<span class="c-msg">Updated version.txt</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/8c58a4de" target="_blank" rel="noopener">8c58a4de</a>
+<span class="c-date">Nov 03, 2016</span>
+<span class="c-msg">Remove eBird dataset from retriever</span>
+</div>
+<div class="month-group"><h3>October 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/45465ee2" target="_blank" rel="noopener">45465ee2</a>
+<span class="c-date">Oct 22, 2016</span>
+<span class="c-msg">Merge pull request #691 from goelakash/fix_datasets</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/40582a27" target="_blank" rel="noopener">40582a27</a>
+<span class="c-date">Oct 12, 2016</span>
+<span class="c-msg">Fix installation of LEDA, BAAD and Pertraitis dataset, along with similar changes in BBS and BBS50.</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/5ab9bb94" target="_blank" rel="noopener">5ab9bb94</a>
+<span class="c-date">Oct 06, 2016</span>
+<span class="c-msg">Refactor insert_statment for readability</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/6725dff6" target="_blank" rel="noopener">6725dff6</a>
+<span class="c-date">Oct 06, 2016</span>
+<span class="c-msg">Merge pull request #663 from goelakash/ls_exception</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/963add34" target="_blank" rel="noopener">963add34</a>
+<span class="c-date">Oct 06, 2016</span>
+<span class="c-msg">Cast retriever_minimum_version to str before compilation</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/bb001884" target="_blank" rel="noopener">bb001884</a>
+<span class="c-date">Oct 02, 2016</span>
+<span class="c-msg">Change to string before concatenating value with &#x27;&quot;&#x27; delmiters in compile_json function.</span>
+</div>
+<div class="month-group"><h3>September 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/a087cfd7" target="_blank" rel="noopener">a087cfd7</a>
+<span class="c-date">Sep 11, 2016</span>
+<span class="c-msg">Add encoding information to compiled python files</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/0ef7ea1e" target="_blank" rel="noopener">0ef7ea1e</a>
+<span class="c-date">Sep 03, 2016</span>
+<span class="c-msg">Re-add edit_json feature</span>
+</div>
+<div class="month-group"><h3>August 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/88d6fcc5" target="_blank" rel="noopener">88d6fcc5</a>
+<span class="c-date">Aug 24, 2016</span>
+<span class="c-msg">Fixing script install issue in repo</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/536b1265" target="_blank" rel="noopener">536b1265</a>
+<span class="c-date">Aug 23, 2016</span>
+<span class="c-msg">Update docs to show Python 3 support</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/59a05395" target="_blank" rel="noopener">59a05395</a>
+<span class="c-date">Aug 22, 2016</span>
+<span class="c-msg">Fix input of columns for JSON script creation</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/f08957ec" target="_blank" rel="noopener">f08957ec</a>
+<span class="c-date">Aug 21, 2016</span>
+<span class="c-msg">Correct behavior when empty dataset is specified</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/b2177949" target="_blank" rel="noopener">b2177949</a>
+<span class="c-date">Aug 19, 2016</span>
+<span class="c-msg">Update version.txt with JSON scripts</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/7456aef1" target="_blank" rel="noopener">7456aef1</a>
+<span class="c-date">Aug 19, 2016</span>
+<span class="c-msg">Use master to get latest JSON scripts</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/87fb8586" target="_blank" rel="noopener">87fb8586</a>
+<span class="c-date">Aug 19, 2016</span>
+<span class="c-msg">Add updated JSON scripts to master</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/05a39458" target="_blank" rel="noopener">05a39458</a>
+<span class="c-date">Aug 19, 2016</span>
+<span class="c-msg">Fix imports</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/77180650" target="_blank" rel="noopener">77180650</a>
+<span class="c-date">Aug 19, 2016</span>
+<span class="c-msg">cleanup using autopep8</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/b902282f" target="_blank" rel="noopener">b902282f</a>
+<span class="c-date">Aug 17, 2016</span>
+<span class="c-msg">Add delete_json functionality</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/75319397" target="_blank" rel="noopener">75319397</a>
+<span class="c-date">Aug 17, 2016</span>
+<span class="c-msg">Disable edit_json feature</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/abd6ff9a" target="_blank" rel="noopener">abd6ff9a</a>
+<span class="c-date">Aug 17, 2016</span>
+<span class="c-msg">Add unit tests for add_dialect and add_schema functions for JSON compilation</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/d78f6606" target="_blank" rel="noopener">d78f6606</a>
+<span class="c-date">Aug 14, 2016</span>
+<span class="c-msg">Add Datapackage.JSON standard mention for scripts in docs</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/116b37f7" target="_blank" rel="noopener">116b37f7</a>
+<span class="c-date">Aug 12, 2016</span>
+<span class="c-msg">Refactor CLI input for testability and add unit tests</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/8783c3fb" target="_blank" rel="noopener">8783c3fb</a>
+<span class="c-date">Aug 11, 2016</span>
+<span class="c-msg">Remove pyyaml</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/b09e977d" target="_blank" rel="noopener">b09e977d</a>
+<span class="c-date">Aug 10, 2016</span>
+<span class="c-msg">Add docstrings to new functions</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/531f05cf" target="_blank" rel="noopener">531f05cf</a>
+<span class="c-date">Aug 09, 2016</span>
+<span class="c-msg">Add function to clean input</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/85b14e41" target="_blank" rel="noopener">85b14e41</a>
+<span class="c-date">Aug 07, 2016</span>
+<span class="c-msg">Add docs for JSON script creation/editing and CLI bug-fixes</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/351bfc14" target="_blank" rel="noopener">351bfc14</a>
+<span class="c-date">Aug 07, 2016</span>
+<span class="c-msg">Update Python 3 version to 3.5 for appveyor</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/5678c9ab" target="_blank" rel="noopener">5678c9ab</a>
+<span class="c-date">Aug 07, 2016</span>
+<span class="c-msg">parse keywords before storing</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/e3b1814e" target="_blank" rel="noopener">e3b1814e</a>
+<span class="c-date">Aug 04, 2016</span>
+<span class="c-msg">Add docstrings and comments, refactoring &amp; some bug-fixing</span>
+</div>
+<div class="month-group"><h3>July 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/3c505c57" target="_blank" rel="noopener">3c505c57</a>
+<span class="c-date">Jul 20, 2016</span>
+<span class="c-msg">Search for json instead of .script module</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/9ddc98f4" target="_blank" rel="noopener">9ddc98f4</a>
+<span class="c-date">Jul 20, 2016</span>
+<span class="c-msg">Added _version file</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/4d424306" target="_blank" rel="noopener">4d424306</a>
+<span class="c-date">Jul 20, 2016</span>
+<span class="c-msg">Change encoding type in comment in __main__.py</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/e4031e10" target="_blank" rel="noopener">e4031e10</a>
+<span class="c-date">Jul 18, 2016</span>
+<span class="c-msg">Replace script to json by default</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/7718d69e" target="_blank" rel="noopener">7718d69e</a>
+<span class="c-date">Jul 18, 2016</span>
+<span class="c-msg">Track changes in JSON files</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/aeecf7a7" target="_blank" rel="noopener">aeecf7a7</a>
+<span class="c-date">Jul 18, 2016</span>
+<span class="c-msg">Update PortalMammals URL</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/9f05ea31" target="_blank" rel="noopener">9f05ea31</a>
+<span class="c-date">Jul 16, 2016</span>
+<span class="c-msg">Add row value length checks before adding to table (with integraton tests)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/134a9ed6" target="_blank" rel="noopener">134a9ed6</a>
+<span class="c-date">Jul 09, 2016</span>
+<span class="c-msg">Set default encoding to &#x27;latin-1&#x27;</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/722358ab" target="_blank" rel="noopener">722358ab</a>
+<span class="c-date">Jul 09, 2016</span>
+<span class="c-msg">latin-1 encoding changes for python 2/3 compatibility</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/7ce68f10" target="_blank" rel="noopener">7ce68f10</a>
+<span class="c-date">Jul 01, 2016</span>
+<span class="c-msg">Edit JSON scripts from CLI</span>
+</div>
+<div class="month-group"><h3>June 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/e2c87492" target="_blank" rel="noopener">e2c87492</a>
+<span class="c-date">Jun 28, 2016</span>
+<span class="c-msg">Changed python requirement to 2.7+ and 3.3+ to README.</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/2dbc9eff" target="_blank" rel="noopener">2dbc9eff</a>
+<span class="c-date">Jun 28, 2016</span>
+<span class="c-msg">Read source files in UTF8 and ignore non-UTF8 chars</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/f4dba513" target="_blank" rel="noopener">f4dba513</a>
+<span class="c-date">Jun 24, 2016</span>
+<span class="c-msg">Revert encoding to avoid decoding issues in Python 2</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/3e925abf" target="_blank" rel="noopener">3e925abf</a>
+<span class="c-date">Jun 22, 2016</span>
+<span class="c-msg">Fix setdefaultencoding comment in __main__.py</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/aef175d5" target="_blank" rel="noopener">aef175d5</a>
+<span class="c-date">Jun 22, 2016</span>
+<span class="c-msg">Add bytes check to postgres engine and remove unnecessary code</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/6b52de0f" target="_blank" rel="noopener">6b52de0f</a>
+<span class="c-date">Jun 16, 2016</span>
+<span class="c-msg">Unicode changes for python3 compatibility</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/7623adfb" target="_blank" rel="noopener">7623adfb</a>
+<span class="c-date">Jun 16, 2016</span>
+<span class="c-msg">setup.py - write to _version.py in standard (non-binary) mode</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/5140fa49" target="_blank" rel="noopener">5140fa49</a>
+<span class="c-date">Jun 16, 2016</span>
+<span class="c-msg">urllib imports</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/c18cef56" target="_blank" rel="noopener">c18cef56</a>
+<span class="c-date">Jun 15, 2016</span>
+<span class="c-msg">Standardize versioning info</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/b67c298f" target="_blank" rel="noopener">b67c298f</a>
+<span class="c-date">Jun 14, 2016</span>
+<span class="c-msg">Moved VERSION to setup.py</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/b42d3a15" target="_blank" rel="noopener">b42d3a15</a>
+<span class="c-date">Jun 12, 2016</span>
+<span class="c-msg">Add CLI to create datapackage.json scripts</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/3050cfc9" target="_blank" rel="noopener">3050cfc9</a>
+<span class="c-date">Jun 11, 2016</span>
+<span class="c-msg">Remove script files from master/version.txt absent from scripts dir</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/56a0b53a" target="_blank" rel="noopener">56a0b53a</a>
+<span class="c-date">Jun 10, 2016</span>
+<span class="c-msg">Cleanup of temp test files</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/56f69881" target="_blank" rel="noopener">56f69881</a>
+<span class="c-date">Jun 10, 2016</span>
+<span class="c-msg">Add absolute imports and builtins imports</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/85a03c07" target="_blank" rel="noopener">85a03c07</a>
+<span class="c-date">Jun 07, 2016</span>
+<span class="c-msg">Updated md5sum according to commit #508</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/39567d60" target="_blank" rel="noopener">39567d60</a>
+<span class="c-date">Jun 06, 2016</span>
+<span class="c-msg">Adhering to datapackage.JSON format and conversion of JSON to python</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/d95103f2" target="_blank" rel="noopener">d95103f2</a>
+<span class="c-date">Jun 03, 2016</span>
+<span class="c-msg">Python 3 compatibility changes</span>
+</div>
+<div class="month-group"><h3>May 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/3356342e" target="_blank" rel="noopener">3356342e</a>
+<span class="c-date">May 23, 2016</span>
+<span class="c-msg">Updated code for script to JSON conversion</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/17febe19" target="_blank" rel="noopener">17febe19</a>
+<span class="c-date">May 17, 2016</span>
+<span class="c-msg">Print exception message if script not loaded</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/6a10329c" target="_blank" rel="noopener">6a10329c</a>
+<span class="c-date">May 16, 2016</span>
+<span class="c-msg">Forcing value to type str for keys starting with &#x27;*&#x27;</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/acaa7076" target="_blank" rel="noopener">acaa7076</a>
+<span class="c-date">May 13, 2016</span>
+<span class="c-msg">Added verbose mode and keyword search for dataset display</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/72624201" target="_blank" rel="noopener">72624201</a>
+<span class="c-date">May 05, 2016</span>
+<span class="c-msg">Updated postgresql to 9.2 in .travis.yaml</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/3eff64b3" target="_blank" rel="noopener">3eff64b3</a>
+<span class="c-date">May 01, 2016</span>
+<span class="c-msg">Cleanup of temporary files after running tests (#483)</span>
+</div>
+<div class="month-group"><h3>March 2016</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/97089d94" target="_blank" rel="noopener">97089d94</a>
+<span class="c-date">Mar 22, 2016</span>
+<span class="c-msg">Ignore .cache folder</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/53335d4b" target="_blank" rel="noopener">53335d4b</a>
+<span class="c-date">Mar 19, 2016</span>
+<span class="c-msg">Created new JSON files</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/weecology/retriever/commit/6dc16a2f" target="_blank" rel="noopener">6dc16a2f</a>
+<span class="c-date">Mar 19, 2016</span>
+<span class="c-msg">Parsing script to JSON</span>
+</div>
+<div class="footer">
+<p>Part of <a href="index.html">Akash Goel's OSS Contributions</a></p>
+</div>
+</div>
+</body>
+</html>

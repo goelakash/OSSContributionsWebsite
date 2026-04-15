@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>aws/amazon-sagemaker-examples — OSS Contributions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:#58a6ff;text-decoration:none;transition:color .2s}
+a:hover{color:#79c0ff}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+/* Hero */
+.hero{padding:64px 0 48px;text-align:center;border-bottom:1px solid #21262d}
+.hero h1{font-size:2.5rem;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.hero .subtitle{font-size:1.1rem;color:#8b949e;margin-bottom:32px}
+.stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-bottom:32px}
+.stat{text-align:center}
+.stat .num{font-size:2rem;font-weight:700;color:#58a6ff;display:block}
+.stat .label{font-size:.85rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em}
+/* Timeline bar */
+.timeline-bar{display:flex;align-items:end;justify-content:center;gap:4px;height:48px;margin-bottom:8px}
+.timeline-bar .year-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.timeline-bar .bar{width:28px;border-radius:3px 3px 0 0;background:#238636;min-height:2px;transition:background .2s}
+.timeline-bar .bar:hover{background:#2ea043}
+.timeline-bar .yr{font-size:.65rem;color:#8b949e}
+/* Filters */
+.filters{display:flex;justify-content:center;gap:8px;padding:24px 0;flex-wrap:wrap}
+.filters button{background:#21262d;color:#c9d1d9;border:1px solid #30363d;padding:8px 18px;border-radius:20px;cursor:pointer;font-size:.85rem;font-family:inherit;transition:all .2s}
+.filters button:hover,.filters button.active{background:#58a6ff;color:#0d1117;border-color:#58a6ff}
+/* Section headers */
+.section-header{font-size:1.3rem;font-weight:600;color:#f0f6fc;margin:40px 0 20px;padding-bottom:12px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:12px}
+.section-header .badge{font-size:.75rem;background:#238636;color:#fff;padding:3px 10px;border-radius:12px;font-weight:500}
+.section-header .joss-badge{background:#8957e5}
+/* Cards grid */
+.cards{display:grid;gap:20px;margin-bottom:32px}
+.cards.tier1{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.cards.tier2{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.cards.tier3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+/* Card */
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:24px;transition:border-color .2s,transform .15s;cursor:pointer;display:flex;flex-direction:column;position:relative;text-decoration:none;color:inherit}
+.card:hover{border-color:#58a6ff;transform:translateY(-2px)}
+.card.tier1-card{border-left:3px solid #58a6ff}
+.card.tier2-card{border-left:3px solid #8957e5}
+.card .repo-name{font-size:1.1rem;font-weight:600;color:#58a6ff;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .repo-name .joss-tag{font-size:.65rem;background:#8957e5;color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
+.card .repo-name .auto-tag{font-size:.65rem;background:#d29922;color:#0d1117;padding:2px 8px;border-radius:10px;font-weight:500}
+.card .desc{font-size:.9rem;color:#8b949e;margin-bottom:12px;flex-grow:1}
+.card .meta{display:flex;align-items:center;gap:16px;font-size:.8rem;color:#8b949e;margin-bottom:12px;flex-wrap:wrap}
+.card .meta .lang{display:flex;align-items:center;gap:4px}
+.card .meta .lang .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.card .commit-count{font-weight:600;color:#c9d1d9}
+/* Sparkline */
+.sparkline{display:flex;align-items:end;gap:1px;height:24px;margin-bottom:12px}
+.sparkline .spark-bar{flex:1;border-radius:1px 1px 0 0;background:#238636;min-height:1px;opacity:.7}
+/* Commit previews */
+.commit-previews{border-top:1px solid #21262d;padding-top:10px;margin-top:auto}
+.commit-previews .cp{font-size:.78rem;color:#8b949e;padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.commit-previews .cp .sha{color:#58a6ff;font-family:'SF Mono',Consolas,monospace;font-size:.72rem;margin-right:6px}
+/* Tier 4 compact list */
+.compact-section{margin-bottom:40px}
+.compact-toggle{background:#161b22;border:1px solid #30363d;color:#c9d1d9;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:.95rem;font-family:inherit;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s}
+.compact-toggle:hover{border-color:#58a6ff}
+.compact-toggle .arrow{transition:transform .3s}
+.compact-toggle.open .arrow{transform:rotate(180deg)}
+.compact-list{display:none;margin-top:8px}
+.compact-list.open{display:block}
+.compact-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #21262d;gap:16px;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit}
+.compact-item:hover{background:#161b22}
+.compact-item:last-child{border-bottom:none}
+.compact-item .ci-name{font-weight:500;color:#58a6ff;min-width:200px;font-size:.9rem}
+.compact-item .ci-desc{color:#8b949e;font-size:.82rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-item .ci-count{font-weight:600;color:#c9d1d9;font-size:.85rem;min-width:60px;text-align:right}
+.compact-item .ci-dates{color:#8b949e;font-size:.78rem;min-width:120px;text-align:right}
+.compact-item .ci-lang .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.compact-item .ci-tags{display:flex;gap:4px}
+.compact-item .auto-tag{font-size:.6rem;background:#d29922;color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:500}
+.compact-item .upstream-tag{font-size:.6rem;background:#238636;color:#fff;padding:1px 6px;border-radius:8px;font-weight:500}
+/* Footer */
+.footer{text-align:center;padding:40px 0;border-top:1px solid #21262d;color:#8b949e;font-size:.85rem}
+/* Detail page */
+.detail-header{padding:48px 0 32px;border-bottom:1px solid #21262d}
+.detail-header .back{font-size:.9rem;color:#58a6ff;margin-bottom:16px;display:inline-block}
+.detail-header .back:hover{color:#79c0ff}
+.detail-header h1{font-size:2rem;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.detail-header .desc{color:#8b949e;font-size:1rem;margin-bottom:16px}
+.detail-header .meta{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.detail-header .meta span{font-size:.9rem;color:#8b949e}
+.detail-header .meta .lang .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+.detail-header .meta .count{font-weight:600;color:#c9d1d9}
+.detail-header .gh-link{color:#58a6ff;font-size:.9rem}
+.month-group{margin:32px 0 16px}
+.month-group h3{font-size:1rem;font-weight:600;color:#f0f6fc;padding-bottom:8px;border-bottom:1px solid #21262d}
+.commit-row{display:flex;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(48,54,61,.5);gap:16px}
+.commit-row:last-child{border-bottom:none}
+.commit-row .c-sha{font-family:'SF Mono',Consolas,monospace;font-size:.82rem;color:#58a6ff;min-width:80px}
+.commit-row .c-sha:hover{text-decoration:underline}
+.commit-row .c-date{font-size:.82rem;color:#8b949e;min-width:100px}
+.commit-row .c-msg{font-size:.9rem;color:#c9d1d9;flex:1}
+@media(max-width:768px){
+  .hero h1{font-size:1.8rem}
+  .stats{gap:24px}
+  .stat .num{font-size:1.5rem}
+  .cards.tier1,.cards.tier2,.cards.tier3{grid-template-columns:1fr}
+  .compact-item{flex-wrap:wrap;gap:8px}
+  .compact-item .ci-name{min-width:auto}
+  .compact-item .ci-desc{display:none}
+  .commit-row{flex-wrap:wrap;gap:4px}
+  .commit-row .c-date{min-width:auto}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="detail-header">
+<a href="index.html" class="back">← Back to all projects</a>
+<h1>aws/amazon-sagemaker-examples</h1>
+<p class="desc">RL notebook examples, Dockerfile updates, integration tests.</p>
+<div class="meta">
+<span class="count">15 commits</span>
+<span>Jul 31, 2020 — May 03, 2021</span>
+<span class="lang"><span class="dot" style="background:#3572A5"></span> Python</span>
+<a class="gh-link" href="https://github.com/aws/amazon-sagemaker-examples" target="_blank" rel="noopener">View on GitHub ↗</a>
+</div>
+</div>
+<div class="month-group"><h3>May 2021</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/b05f7194" target="_blank" rel="noopener">b05f7194</a>
+<span class="c-date">May 03, 2021</span>
+<span class="c-msg">RL: Update Dockerfile for roboschool stable baselines (#1912)</span>
+</div>
+<div class="month-group"><h3>January 2021</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/8d6fa2a5" target="_blank" rel="noopener">8d6fa2a5</a>
+<span class="c-date">Jan 13, 2021</span>
+<span class="c-msg">RL: Adding &quot;-evaluation&quot; suffix to eval jobs in cartpole coach notebooks.. (#1913)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/170dd9f6" target="_blank" rel="noopener">170dd9f6</a>
+<span class="c-date">Jan 13, 2021</span>
+<span class="c-msg">RL: Update HVAC and roboschool distributed training notebooks (#1914)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/39341172" target="_blank" rel="noopener">39341172</a>
+<span class="c-date">Jan 13, 2021</span>
+<span class="c-msg">RL: Update HVAC training notebook (#1928)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/ba737799" target="_blank" rel="noopener">ba737799</a>
+<span class="c-date">Jan 06, 2021</span>
+<span class="c-msg">RL: Minor updates to a few notebooks (#1911)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/d7d97423" target="_blank" rel="noopener">d7d97423</a>
+<span class="c-date">Jan 05, 2021</span>
+<span class="c-msg">RL: Replace custom docker image and add Ray 0.8.5 to Ray cartpole training and evalulation (#1910)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/6cffd082" target="_blank" rel="noopener">6cffd082</a>
+<span class="c-date">Jan 05, 2021</span>
+<span class="c-msg">RL: Update tf_serving_utils.py to fix errors in Cartpole Ray notebook. (#1909)</span>
+</div>
+<div class="month-group"><h3>December 2020</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/f293c56b" target="_blank" rel="noopener">f293c56b</a>
+<span class="c-date">Dec 12, 2020</span>
+<span class="c-msg">Update the following RL notebooks to Ray 0.8.5: (#1799)</span>
+</div>
+<div class="month-group"><h3>November 2020</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/edfc2d04" target="_blank" rel="noopener">edfc2d04</a>
+<span class="c-date">Nov 16, 2020</span>
+<span class="c-msg">Update RL notebooks to Sagemaker Python SDK v2 (#1741)</span>
+</div>
+<div class="month-group"><h3>October 2020</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/f45839b7" target="_blank" rel="noopener">f45839b7</a>
+<span class="c-date">Oct 23, 2020</span>
+<span class="c-msg">delete extra common folder inside rl_game_server_autopilot/sagemaker directory (#1653)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/f00a5a68" target="_blank" rel="noopener">f00a5a68</a>
+<span class="c-date">Oct 23, 2020</span>
+<span class="c-msg">fix: move the Tensorflow import in coach_launcher.py inside the _save_tf_model fn (#1652)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/e4efb1f7" target="_blank" rel="noopener">e4efb1f7</a>
+<span class="c-date">Oct 19, 2020</span>
+<span class="c-msg">Running tests in parallel for RL notebooks. (#1624)</span>
+</div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/0fc7201e" target="_blank" rel="noopener">0fc7201e</a>
+<span class="c-date">Oct 13, 2020</span>
+<span class="c-msg">Add integration tests using Papermill library for RL notebooks. List of notebooks covered in the tests: (#1580)</span>
+</div>
+<div class="month-group"><h3>August 2020</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/aafbb771" target="_blank" rel="noopener">aafbb771</a>
+<span class="c-date">Aug 26, 2020</span>
+<span class="c-msg">Minor: fix typo in introduction_to_applying_machine_learning/US-census_population_segmentation_PCA_Kmeans/sagemaker-countycensusclustering.ipynb (#1467)</span>
+</div>
+<div class="month-group"><h3>July 2020</h3></div>
+<div class="commit-row">
+<a class="c-sha" href="https://github.com/aws/amazon-sagemaker-examples/commit/44d0ffa9" target="_blank" rel="noopener">44d0ffa9</a>
+<span class="c-date">Jul 31, 2020</span>
+<span class="c-msg">Add Cartpole example for learning using ray lib. (#1331)</span>
+</div>
+<div class="footer">
+<p>Part of <a href="index.html">Akash Goel's OSS Contributions</a></p>
+</div>
+</div>
+</body>
+</html>
